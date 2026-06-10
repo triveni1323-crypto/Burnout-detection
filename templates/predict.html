@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="form-page">
+<div class="form-container">
+    <div class="form-header">
+    <h2>📋 Enter Your Daily Data</h2>
+        <p>Fill in your behavioral data for today to get your burnout risk assessment.</p>
+    </div>
+    
+    {% if error %}
+    <div class="alert alert-error">⚠️ Error: {{ error }}</div>
+    {% endif %}
+    <form method="POST" action="/predict">
+        <div class="form-grid">
+            <div class="form-group">
+                <label>⌨️ Typing Speed (WPM)</label>
+                <input type="number" name="typing_speed" placeholder="e.g. 65" min="5" max="150" required>
+                <small>Your average typing speed today</small>
+            </div>
+            <div class="form-group">
+                <label>📚 Study Hours</label>
+                <input type="number" name="study_hours" placeholder="e.g. 6" min="0" max="20" step="0.5" required>
+                <small>Total hours studied today</small>
+            </div>
+            <div class="form-group">
+                <label>☕ Break Count</label>
+                <input type="number" name="break_count" placeholder="e.g. 4" min="0" max="20" required>
+                <small>Number of breaks taken</small>
+            </div>
+            <div class="form-group">
+                <label>😴 Sleep Hours</label>
+                <input type="number" name="sleep_hours" placeholder="e.g. 7" min="0" max="12" step="0.5" required>
+                <small>Hours slept last night</small>
+            </div>
+            <div class="form-group">
+                <label>😊 Mood Score (1-10)</label>
+                <input type="number" name="mood_score" placeholder="e.g. 7" min="1" max="10" required>
+                <small>1=Very Bad, 10=Excellent</small>
+            </div>
+            <div class="form-group">
+                <label>💻 Device Usage (Hours)</label>
+                <input type="number" name="device_usage_hours" placeholder="e.g. 8" min="0" max="20" step="0.5" required>
+                <small>Total screen time today</small>
+            </div>
+            <div class="form-group">
+                <label>✅ Task Completion (%)</label>
+                <input type="number" name="task_completion" placeholder="e.g. 80" min="0" max="100" required>
+                <small>Percentage of tasks completed</small>
+            </div>
+            <div class="form-group">
+                <label>😵 Distraction Count</label>
+                <input type="number" name="distraction_count" placeholder="e.g. 5" min="0" max="30" required>
+                <small>Times you got distracted</small>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-large">
+            🔍 Analyze My Burnout Risk
+        </button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="result-container">
+
+    <!-- RISK LEVEL BADGE -->
+    <div class="risk-badge risk-{{ result.risk_level | lower }}">
+        {% if result.risk_level == 'Low' %}
+            ✅ LOW RISK
+        {% elif result.risk_level == 'Medium' %}
+            ⚠️ MEDIUM RISK
+        {% else %}
+            🚨 HIGH RISK
+        {% endif %}
+    </div>
+
+    <h2>Your Burnout Risk: {{ result.risk_level }}</h2>
+    <p class="confidence">Confidence: <strong>{{ result.confidence }}%</strong></p>
+
+    <!-- PROBABILITY BARS -->
+    <div class="prob-container">
+        <h3>Risk Probability Breakdown</h3>
+
+        <div class="prob-bar">
+            <label>✅ Low Risk</label>
+            <div class="bar-bg">
+                <div class="bar-fill bar-low"
+                     style="width: {{ result.probabilities.Low }}%">
+                    {{ result.probabilities.Low }}%
+                </div>
+            </div>
+        </div>
+
+        <div class="prob-bar">
+            <label>⚠️ Medium Risk</label>
+            <div class="bar-bg">
+                <div class="bar-fill bar-medium"
+                     style="width: {{ result.probabilities.Medium }}%">
+                    {{ result.probabilities.Medium }}%
+                </div>
+            </div>
+        </div>
+
+        <div class="prob-bar">
+            <label>🚨 High Risk</label>
+            <div class="bar-bg">
+                <div class="bar-fill bar-high"
+                     style="width: {{ result.probabilities.High }}%">
+                    {{ result.probabilities.High }}%
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RECOMMENDATIONS -->
+    <div class="recommendations">
+        <h3>💡 Recommendations</h3>
+        {% if result.risk_level == 'Low' %}
+        <ul>
+            <li>✅ Great job! Keep maintaining your current study habits.</li>
+            <li>✅ Continue taking regular breaks every 45-60 minutes.</li>
+            <li>✅ Maintain your sleep schedule of 7-9 hours.</li>
+            <li>✅ Keep your mood score high with hobbies and social activities.</li>
+        </ul>
+        {% elif result.risk_level == 'Medium' %}
+        <ul>
+            <li>⚠️ Consider reducing study hours slightly.</li>
+            <li>⚠️ Take more frequent breaks — try the Pomodoro technique.</li>
+            <li>⚠️ Aim for at least 7 hours of sleep tonight.</li>
+            <li>⚠️ Talk to a friend or mentor about your workload.</li>
+            <li>⚠️ Avoid screen time 1 hour before bed.</li>
+        </ul>
+        {% else %}
+        <ul>
+            <li>🚨 Immediately reduce your study hours today.</li>
+            <li>🚨 Take a proper break — at least 30 minutes away from screens.</li>
+            <li>🚨 Prioritize sleep — do not study past midnight.</li>
+            <li>🚨 Speak to a counselor or trusted adult.</li>
+            <li>🚨 Practice deep breathing or meditation for 10 minutes.</li>
+            <li>🚨 Do not skip meals — proper nutrition is critical now.</li>
+        </ul>
+        {% endif %}
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="result-actions">
+        <a href="/predict" class="btn btn-secondary">🔄 Check Again</a>
+        <a href="/dashboard" class="btn btn-primary">📊 View Dashboard</a>
+    </div>
+
+</div>
+
+{% endblock %}

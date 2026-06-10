@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<section class="hero">
+    <div class="hero-content">
+        <h1>🧠 Student Burnout Detection</h1>
+        <p>AI-powered early warning system to detect burnout before it affects your performance.</p>
+        <a href="/predict" class="btn btn-primary">Check Your Burnout Risk</a>
+        <a href="/dashboard" class="btn btn-secondary">View Dashboard</a>
+    </div>
+</section>
+
+<section class="features">
+    <h2>How It Works</h2>
+    <div class="feature-grid">
+        <div class="feature-card">
+            <span class="icon">📊</span>
+            <h3>Enter Your Data</h3>
+            <p>Input your daily study habits, sleep patterns and mood scores.</p>
+        </div>
+        <div class="feature-card">
+            <span class="icon">🤖</span>
+            <h3>AI Analysis</h3>
+            <p>Our ML model analyzes your behavioral patterns instantly.</p>
+        </div>
+        <div class="feature-card">
+            <span class="icon">⚠️</span>
+            <h3>Get Your Risk Level</h3>
+            <p>Receive Low, Medium or High burnout risk assessment.</p>
+        </div>
+        <div class="feature-card">
+            <span class="icon">💡</span>
+            <h3>Take Action</h3>
+            <p>Get personalized recommendations to prevent burnout.</p>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

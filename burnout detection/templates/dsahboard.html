@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="dashboard-container">
+    <h2>📊 Analytics Dashboard</h2>
+    <p>Visual insights from the burnout detection model.</p>
+
+    <div class="chart-grid">
+        <div class="chart-card">
+            <h3>Risk Distribution</h3>
+            <img src="{{ url_for('static', filename='images/risk_distribution.png') }}"
+                 alt="Risk Distribution">
+        </div>
+        <div class="chart-card">
+            <h3>Feature Correlation</h3>
+            <img src="{{ url_for('static', filename='images/correlation_heatmap.png') }}"
+                 alt="Correlation Heatmap">
+        </div>
+        <div class="chart-card">
+            <h3>Model Comparison</h3>
+            <img src="{{ url_for('static', filename='images/model_comparison.png') }}"
+                 alt="Model Comparison">
+        </div>
+        <div class="chart-card">
+            <h3>Feature Importance</h3>
+            <img src="{{ url_for('static', filename='images/feature_importance.png') }}"
+                 alt="Feature Importance">
+        </div>
+    </div>
+</div>
+
+{% endblock %}

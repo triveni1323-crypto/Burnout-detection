@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.pyc
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Data files (too large for GitHub)
+student_data.csv
+processed_data.csv
+
+# VS Code
+.vscode/
+
+# Windows
+Thumbs.db
+Desktop.ini
+*.lnk
+
+# Logs
+*.log

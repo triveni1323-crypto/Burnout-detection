@@ -1,0 +1,396 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="timer-page">
+
+    <!-- HEADER -->
+    <div class="timer-header">
+        <h2>⏱️ Smart Study Timer</h2>
+        <p>Stay focused and avoid burnout with the Pomodoro technique</p>
+    </div>
+
+    <!-- MAIN TIMER CARD -->
+    <div class="timer-layout">
+
+        <!-- LEFT: TIMER -->
+        <div class="timer-card">
+
+            <!-- MODE SELECTOR -->
+            <div class="mode-selector">
+                <button class="mode-btn active" onclick="setMode('focus')" id="btn-focus">
+                    🎯 Focus
+                </button>
+                <button class="mode-btn" onclick="setMode('short')" id="btn-short">
+                    ☕ Short Break
+                </button>
+                <button class="mode-btn" onclick="setMode('long')" id="btn-long">
+                    🛋️ Long Break
+                </button>
+            </div>
+
+            <!-- TIMER CIRCLE -->
+            <div class="timer-circle-container">
+                <svg class="timer-svg" viewBox="0 0 200 200">
+                    <circle class="timer-bg-circle" cx="100" cy="100" r="90"/>
+                    <circle class="timer-progress-circle" id="progressCircle"
+                            cx="100" cy="100" r="90"
+                            stroke-dasharray="565"
+                            stroke-dashoffset="0"/>
+                </svg>
+                <div class="timer-display">
+                    <div class="timer-time" id="timerDisplay">25:00</div>
+                    <div class="timer-mode-label" id="modeLabel">Focus Time</div>
+                </div>
+            </div>
+
+            <!-- CONTROLS -->
+            <div class="timer-controls">
+                <button class="ctrl-btn" onclick="resetTimer()" title="Reset">↺</button>
+                <button class="start-btn" onclick="toggleTimer()" id="startBtn">
+                    ▶ Start
+                </button>
+                <button class="ctrl-btn" onclick="skipSession()" title="Skip">⏭</button>
+            </div>
+
+            <!-- SESSION INFO -->
+            <div class="session-info">
+                <div class="session-item">
+                    <span class="s-label">Session</span>
+                    <span class="s-value" id="sessionCount">1 / 4</span>
+                </div>
+                <div class="session-item">
+                    <span class="s-label">Today's Focus</span>
+                    <span class="s-value" id="totalFocus">0 min</span>
+                </div>
+                <div class="session-item">
+                    <span class="s-label">Breaks Taken</span>
+                    <span class="s-value" id="breakCount">0</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT: PANELS -->
+        <div class="timer-right">
+
+            <!-- CUSTOM SETTINGS -->
+            <div class="settings-card">
+                <h3>⚙️ Custom Settings</h3>
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <label>Focus (min)</label>
+                        <input type="number" id="focusTime"
+                               value="25" min="1" max="60"
+                               onchange="updateSettings()">
+                    </div>
+                    <div class="setting-item">
+                        <label>Short Break (min)</label>
+                        <input type="number" id="shortBreak"
+                               value="5" min="1" max="30"
+                               onchange="updateSettings()">
+                    </div>
+                    <div class="setting-item">
+                        <label>Long Break (min)</label>
+                        <input type="number" id="longBreak"
+                               value="15" min="5" max="60"
+                               onchange="updateSettings()">
+                    </div>
+                    <div class="setting-item">
+                        <label>Sessions before long break</label>
+                        <input type="number" id="sessionsTarget"
+                               value="4" min="1" max="8"
+                               onchange="updateSettings()">
+                    </div>
+                </div>
+                <label class="toggle-label">
+                    <input type="checkbox" id="soundToggle" checked>
+                    🔔 Sound Notifications
+                </label>
+            </div>
+
+            <!-- TASK LIST -->
+            <div class="task-card">
+                <h3>📝 Today's Tasks</h3>
+                <div class="task-input-row">
+                    <input type="text" id="taskInput"
+                           placeholder="Add a task..."
+                           onkeypress="if(event.key==='Enter') addTask()">
+                    <button onclick="addTask()" class="add-task-btn">+</button>
+                </div>
+                <ul class="task-list" id="taskList">
+                    <li class="task-item" data-id="1">
+                        <input type="checkbox" onchange="toggleTask(this)">
+                        <span>Complete study session</span>
+                        <button onclick="deleteTask(this)">🗑</button>
+                    </li>
+                </ul>
+                <div class="task-stats">
+                    <span id="taskProgress">0/1 completed</span>
+                </div>
+            </div>
+
+            <!-- BURNOUT TIP -->
+            <div class="tip-card" id="tipCard">
+                <h3>💡 Burnout Prevention Tip</h3>
+                <p id="tipText">Take a proper break every 25 minutes. Stand up, stretch, and look away from the screen to reduce eye strain and mental fatigue.</p>
+                <button onclick="nextTip()" class="next-tip-btn">Next Tip →</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SESSION LOG -->
+    <div class="session-log-card">
+        <h3>📊 Today's Session Log</h3>
+        <div class="log-list" id="sessionLog">
+            <div class="log-empty">No sessions completed yet. Start your first session! 🚀</div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// ── TIMER STATE ──────────────────────────────
+let timerInterval  = null;
+let isRunning      = false;
+let currentMode    = 'focus';
+let timeLeft       = 25 * 60;
+let totalSeconds   = 25 * 60;
+let sessionNum     = 1;
+let sessionsTarget = 4;
+let totalFocusMin  = 0;
+let breaksTaken    = 0;
+let taskIdCounter  = 2;
+
+const MODES = {
+    focus: { label: 'Focus Time',   color: '#667eea' },
+    short: { label: 'Short Break',  color: '#2ecc71' },
+    long:  { label: 'Long Break',   color: '#3498db' }
+};
+
+const TIPS = [
+    "Take a proper break every 25 minutes. Stand up, stretch and look away from the screen.",
+    "The Pomodoro technique improves focus by breaking work into 25-minute intervals.",
+    "Drink a glass of water during your break — dehydration increases mental fatigue.",
+    "During long breaks, take a 5-minute walk to boost blood flow to your brain.",
+    "Avoid checking social media during short breaks — it prevents mental recovery.",
+    "Sleep 7-9 hours. Poor sleep is the #1 cause of student burnout.",
+    "Set a daily study limit. Studying 10+ hours daily leads to diminishing returns.",
+    "Write down your tasks before studying — it reduces cognitive load and anxiety.",
+    "Exercise for 20 minutes daily — it significantly reduces burnout symptoms.",
+    "Mood tracking helps detect burnout early. Rate your mood after each session."
+];
+let tipIndex = 0;
+
+// ── TIMER FUNCTIONS ──────────────────────────
+function setMode(mode) {
+    if (isRunning) { toggleTimer(); }
+    currentMode = mode;
+
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-' + mode).classList.add('active');
+
+    const times = {
+        focus: parseInt(document.getElementById('focusTime').value)  * 60,
+        short: parseInt(document.getElementById('shortBreak').value) * 60,
+        long:  parseInt(document.getElementById('longBreak').value)  * 60
+    };
+
+    timeLeft = totalSeconds = times[mode];
+    document.getElementById('modeLabel').textContent = MODES[mode].label;
+    updateDisplay();
+    updateCircle();
+    updateCircleColor();
+}
+
+function toggleTimer() {
+    if (isRunning) {
+        clearInterval(timerInterval);
+        isRunning = false;
+        document.getElementById('startBtn').innerHTML = '▶ Resume';
+    } else {
+        timerInterval = setInterval(tick, 1000);
+        isRunning = true;
+        document.getElementById('startBtn').innerHTML = '⏸ Pause';
+    }
+}
+
+function tick() {
+    if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        isRunning = false;
+        sessionComplete();
+        return;
+    }
+    timeLeft--;
+    updateDisplay();
+    updateCircle();
+}
+
+function updateDisplay() {
+    const m = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+    const s = String(timeLeft % 60).padStart(2, '0');
+    document.getElementById('timerDisplay').textContent = m + ':' + s;
+    document.title = m + ':' + s + ' — BurnoutAI Timer';
+}
+
+function updateCircle() {
+    const circumference = 565;
+    const offset = circumference * (1 - timeLeft / totalSeconds);
+    document.getElementById('progressCircle').style.strokeDashoffset = offset;
+}
+
+function updateCircleColor() {
+    const colors = { focus: '#667eea', short: '#2ecc71', long: '#3498db' };
+    document.getElementById('progressCircle').style.stroke = colors[currentMode];
+}
+
+function resetTimer() {
+    clearInterval(timerInterval);
+    isRunning = false;
+    document.getElementById('startBtn').innerHTML = '▶ Start';
+    setMode(currentMode);
+}
+
+function skipSession() {
+    clearInterval(timerInterval);
+    isRunning = false;
+    sessionComplete();
+}
+
+function sessionComplete() {
+    document.getElementById('startBtn').innerHTML = '▶ Start';
+
+    if (document.getElementById('soundToggle').checked) {
+        playBeep();
+    }
+
+    const now = new Date().toLocaleTimeString();
+
+    if (currentMode === 'focus') {
+        const focusMins = parseInt(document.getElementById('focusTime').value);
+        totalFocusMin += focusMins;
+        document.getElementById('totalFocus').textContent = totalFocusMin + ' min';
+
+        addLog('🎯 Focus Session #' + sessionNum + ' completed — ' +
+               focusMins + ' min', now, 'log-focus');
+
+        if (sessionNum >= sessionsTarget) {
+            sessionNum = 1;
+            setMode('long');
+            showNotification('🎉 Great work! Take a long break — you earned it!');
+        } else {
+            sessionNum++;
+            setMode('short');
+            showNotification('✅ Focus session done! Take a short break.');
+        }
+        document.getElementById('sessionCount').textContent =
+            sessionNum + ' / ' + sessionsTarget;
+
+    } else {
+        breaksTaken++;
+        document.getElementById('breakCount').textContent = breaksTaken;
+        addLog('☕ Break completed', now, 'log-break');
+        setMode('focus');
+        showNotification('⏰ Break over! Time to focus again.');
+    }
+}
+
+function updateSettings() {
+    sessionsTarget = parseInt(document.getElementById('sessionsTarget').value);
+    document.getElementById('sessionCount').textContent =
+        sessionNum + ' / ' + sessionsTarget;
+    if (!isRunning) setMode(currentMode);
+}
+
+// ── NOTIFICATION ────────────────────────────
+function showNotification(msg) {
+    const notif = document.createElement('div');
+    notif.className = 'timer-notification';
+    notif.textContent = msg;
+    document.body.appendChild(notif);
+    setTimeout(() => notif.classList.add('show'), 100);
+    setTimeout(() => {
+        notif.classList.remove('show');
+        setTimeout(() => notif.remove(), 500);
+    }, 3500);
+}
+
+// ── SOUND ────────────────────────────────────
+function playBeep() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = 800;
+        osc.type = 'sine';
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.8);
+    } catch(e) {}
+}
+
+// ── TASKS ────────────────────────────────────
+function addTask() {
+    const input = document.getElementById('taskInput');
+    const text  = input.value.trim();
+    if (!text) return;
+
+    const li = document.createElement('li');
+    li.className = 'task-item';
+    li.dataset.id = taskIdCounter++;
+    li.innerHTML = `
+        <input type="checkbox" onchange="toggleTask(this)">
+        <span>${text}</span>
+        <button onclick="deleteTask(this)">🗑</button>
+    `;
+    document.getElementById('taskList').appendChild(li);
+    input.value = '';
+    updateTaskStats();
+}
+
+function toggleTask(cb) {
+    const span = cb.nextElementSibling;
+    span.style.textDecoration = cb.checked ? 'line-through' : 'none';
+    span.style.opacity = cb.checked ? '0.5' : '1';
+    updateTaskStats();
+}
+
+function deleteTask(btn) {
+    btn.parentElement.remove();
+    updateTaskStats();
+}
+
+function updateTaskStats() {
+    const all  = document.querySelectorAll('.task-item').length;
+    const done = document.querySelectorAll('.task-item input:checked').length;
+    document.getElementById('taskProgress').textContent =
+        done + '/' + all + ' completed';
+}
+
+// ── SESSION LOG ──────────────────────────────
+function addLog(text, time, cls) {
+    const log = document.getElementById('sessionLog');
+    const empty = log.querySelector('.log-empty');
+    if (empty) empty.remove();
+
+    const div = document.createElement('div');
+    div.className = 'log-item ' + cls;
+    div.innerHTML = `<span>${text}</span><span class="log-time">${time}</span>`;
+    log.insertBefore(div, log.firstChild);
+}
+
+// ── TIPS ─────────────────────────────────────
+function nextTip() {
+    tipIndex = (tipIndex + 1) % TIPS.length;
+    document.getElementById('tipText').textContent = TIPS[tipIndex];
+}
+
+// Rotate tips every 30 seconds
+setInterval(nextTip, 30000);
+</script>
+
+{% endblock %}

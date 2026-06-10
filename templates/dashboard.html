@@ -1,0 +1,432 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="dashboard-page">
+
+    <!-- HEADER -->
+    <div class="dash-header">
+        <div>
+            <h2>📊 Analytics Dashboard</h2>
+            <p>Real-time insights from the Burnout Detection Model</p>
+        </div>
+        <div class="dash-date" id="dashDate"></div>
+    </div>
+
+    <!-- TOP STATS CARDS -->
+    <div class="dash-stats-row">
+        <div class="dash-stat-card card-blue">
+            <div class="dsc-icon">👥</div>
+            <div class="dsc-info">
+                <span class="dsc-number" data-target="1000">0</span>
+                <span class="dsc-label">Students Analyzed</span>
+            </div>
+        </div>
+        <div class="dash-stat-card card-green">
+            <div class="dsc-icon">✅</div>
+            <div class="dsc-info">
+                <span class="dsc-number" data-target="400">0</span>
+                <span class="dsc-label">Low Risk Students</span>
+            </div>
+        </div>
+        <div class="dash-stat-card card-orange">
+            <div class="dsc-icon">⚠️</div>
+            <div class="dsc-info">
+                <span class="dsc-number" data-target="350">0</span>
+                <span class="dsc-label">Medium Risk Students</span>
+            </div>
+        </div>
+        <div class="dash-stat-card card-red">
+            <div class="dsc-icon">🚨</div>
+            <div class="dsc-info">
+                <span class="dsc-number" data-target="250">0</span>
+                <span class="dsc-label">High Risk Students</span>
+            </div>
+        </div>
+        <div class="dash-stat-card card-purple">
+            <div class="dsc-icon">🎯</div>
+            <div class="dsc-info">
+                <span class="dsc-number" data-target="100" data-suffix="%">0%</span>
+                <span class="dsc-label">Model Accuracy</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHARTS ROW 1 -->
+    <div class="dash-grid-2">
+
+        <!-- Donut Chart -->
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <h3>🍩 Risk Distribution</h3>
+                <span class="badge">Live Data</span>
+            </div>
+            <div class="donut-container">
+                <svg viewBox="0 0 200 200" class="donut-svg">
+                    <!-- High Risk -->
+                    <circle class="donut-segment seg-high"
+                            cx="100" cy="100" r="70"
+                            stroke-dasharray="110 330"
+                            stroke-dashoffset="0"/>
+                    <!-- Medium Risk -->
+                    <circle class="donut-segment seg-medium"
+                            cx="100" cy="100" r="70"
+                            stroke-dasharray="154 286"
+                            stroke-dashoffset="-110"/>
+                    <!-- Low Risk -->
+                    <circle class="donut-segment seg-low"
+                            cx="100" cy="100" r="70"
+                            stroke-dasharray="176 264"
+                            stroke-dashoffset="-264"/>
+                    <text x="100" y="95" class="donut-center-text">1000</text>
+                    <text x="100" y="115" class="donut-center-sub">Students</text>
+                </svg>
+                <div class="donut-legend">
+                    <div class="legend-item">
+                        <span class="legend-dot dot-low"></span>
+                        <span>Low Risk</span>
+                        <strong>400 (40%)</strong>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot dot-medium"></span>
+                        <span>Medium Risk</span>
+                        <strong>350 (35%)</strong>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot dot-high"></span>
+                        <span>High Risk</span>
+                        <strong>250 (25%)</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bar Chart: Model Comparison -->
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <h3>🤖 Model Performance Comparison</h3>
+                <span class="badge">ML Metrics</span>
+            </div>
+            <div class="bar-chart-container">
+                <div class="bar-chart">
+                    <div class="bar-group">
+                        <div class="bar-label">Accuracy</div>
+                        <div class="bar-track">
+                            <div class="bar-fill-lr" style="--w: 87%">
+                                <span>LR 87%</span>
+                            </div>
+                        </div>
+                        <div class="bar-track">
+                            <div class="bar-fill-rf" style="--w: 100%">
+                                <span>RF 100%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar-label">Precision</div>
+                        <div class="bar-track">
+                            <div class="bar-fill-lr" style="--w: 85%">
+                                <span>LR 85%</span>
+                            </div>
+                        </div>
+                        <div class="bar-track">
+                            <div class="bar-fill-rf" style="--w: 100%">
+                                <span>RF 100%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar-label">Recall</div>
+                        <div class="bar-track">
+                            <div class="bar-fill-lr" style="--w: 86%">
+                                <span>LR 86%</span>
+                            </div>
+                        </div>
+                        <div class="bar-track">
+                            <div class="bar-fill-rf" style="--w: 100%">
+                                <span>RF 100%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar-label">F1-Score</div>
+                        <div class="bar-track">
+                            <div class="bar-fill-lr" style="--w: 85%">
+                                <span>LR 85%</span>
+                            </div>
+                        </div>
+                        <div class="bar-track">
+                            <div class="bar-fill-rf" style="--w: 100%">
+                                <span>RF 100%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bar-legend">
+                    <span class="bl-lr">■ Logistic Regression</span>
+                    <span class="bl-rf">■ Random Forest</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHARTS ROW 2 -->
+    <div class="dash-grid-2">
+
+        <!-- Feature Importance -->
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <h3>🎯 Feature Importance</h3>
+                <span class="badge">Random Forest</span>
+            </div>
+            <div class="feature-bars">
+                <div class="feat-row">
+                    <span class="feat-name">Mood Score</span>
+                    <div class="feat-track">
+                        <div class="feat-fill" style="--w:92%; --c:#667eea">
+                            <span>92%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="feat-row">
+                    <span class="feat-name">Sleep Hours</span>
+                    <div class="feat-track">
+                        <div class="feat-fill" style="--w:85%; --c:#764ba2">
+                            <span>85%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="feat-row">
+                    <span class="feat-name">Task Completion</span>
+                    <div class="feat-track">
+                        <div class="feat-fill" style="--w:78%; --c:#2ecc71">
+                            <span>78%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="feat-row">
+                    <span class="feat-name">Study Hours</span>
+                    <div class="feat-track">
+                        <div class="feat-fill" style="--w:72%; --c:#f39c12">
+                            <span>72%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="feat-row">
+                    <span class="feat-name">Typing Speed</span>
+                    <div class="feat-track">
+                        <div class="feat-fill" style="--w:65%; --c:#e74c3c">
+                            <span>65%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="feat-row">
+                    <span class="feat-name">Distraction Count</span>
+                    <div class="feat-track">
+                        <div class="feat-fill" style="--w:58%; --c:#3498db">
+                            <span>58%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="feat-row">
+                    <span class="feat-name">Break Count</span>
+                    <div class="feat-track">
+                        <div class="feat-fill" style="--w:50%; --c:#1abc9c">
+                            <span>50%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="feat-row">
+                    <span class="feat-name">Device Usage</span>
+                    <div class="feat-track">
+                        <div class="feat-fill" style="--w:43%; --c:#e67e22">
+                            <span>43%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Burnout Risk Meter -->
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <h3>🌡️ Live Risk Simulator</h3>
+                <span class="badge">Interactive</span>
+            </div>
+            <div class="risk-simulator">
+                <p class="sim-desc">Adjust sliders to simulate burnout risk level</p>
+
+                <div class="slider-group">
+                    <label>😴 Sleep Hours: <strong id="sleepVal">7</strong>h</label>
+                    <input type="range" min="2" max="10" value="7"
+                           oninput="updateSim()" id="simSleep">
+                </div>
+                <div class="slider-group">
+                    <label>📚 Study Hours: <strong id="studyVal">6</strong>h</label>
+                    <input type="range" min="1" max="14" value="6"
+                           oninput="updateSim()" id="simStudy">
+                </div>
+                <div class="slider-group">
+                    <label>😊 Mood Score: <strong id="moodVal">7</strong>/10</label>
+                    <input type="range" min="1" max="10" value="7"
+                           oninput="updateSim()" id="simMood">
+                </div>
+                <div class="slider-group">
+                    <label>☕ Break Count: <strong id="breakVal">4</strong></label>
+                    <input type="range" min="0" max="10" value="4"
+                           oninput="updateSim()" id="simBreak">
+                </div>
+
+                <!-- Risk Meter -->
+                <div class="risk-meter">
+                    <div class="meter-track">
+                        <div class="meter-fill" id="meterFill"></div>
+                    </div>
+                    <div class="meter-labels">
+                        <span>Low</span>
+                        <span>Medium</span>
+                        <span>High</span>
+                    </div>
+                </div>
+                <div class="sim-result" id="simResult">
+                    <span class="sim-badge" id="simBadge">✅ LOW RISK</span>
+                    <p id="simTip">Keep it up! Your habits look healthy.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHARTS ROW 3 — ML Images -->
+    <div class="dash-grid-2">
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <h3>🔥 Confusion Matrix — Random Forest</h3>
+                <span class="badge">Best Model</span>
+            </div>
+            <img src="/static/images/cm_random_forest.png"
+                 alt="Confusion Matrix RF" class="dash-img">
+        </div>
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <h3>🔵 Confusion Matrix — Logistic Regression</h3>
+                <span class="badge">Baseline</span>
+            </div>
+            <img src="/static/images/cm_logistic.png"
+                 alt="Confusion Matrix LR" class="dash-img">
+        </div>
+    </div>
+
+    <!-- BURNOUT FACTS -->
+    <div class="dash-card facts-card">
+        <div class="dash-card-header">
+            <h3>📚 Burnout Research Facts</h3>
+            <span class="badge">Evidence Based</span>
+        </div>
+        <div class="facts-grid">
+            <div class="fact-item">
+                <span class="fact-num">40%</span>
+                <p>of students experience burnout symptoms during their academic career</p>
+            </div>
+            <div class="fact-item">
+                <span class="fact-num">2x</span>
+                <p>more likely to drop out when burnout goes undetected for over 2 weeks</p>
+            </div>
+            <div class="fact-item">
+                <span class="fact-num">7-9h</span>
+                <p>of sleep is the single most important factor in preventing burnout</p>
+            </div>
+            <div class="fact-item">
+                <span class="fact-num">25min</span>
+                <p>Pomodoro sessions are optimal for sustained focus without fatigue</p>
+            </div>
+            <div class="fact-item">
+                <span class="fact-num">85%</span>
+                <p>of burnout cases can be prevented with early detection and intervention</p>
+            </div>
+            <div class="fact-item">
+                <span class="fact-num">3x</span>
+                <p>faster recovery when burnout is detected early vs late stage</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// Animate stat numbers
+window.addEventListener('load', () => {
+    document.querySelectorAll('.dsc-number').forEach(el => {
+        const target  = parseInt(el.dataset.target);
+        const suffix  = el.dataset.suffix || '';
+        let current   = 0;
+        const step    = target / 60;
+        const timer   = setInterval(() => {
+            current += step;
+            if (current >= target) {
+                current = target;
+                clearInterval(timer);
+            }
+            el.textContent = Math.floor(current) + suffix;
+        }, 25);
+    });
+
+    // Animate feature bars
+    setTimeout(() => {
+        document.querySelectorAll('.feat-fill, .bar-fill-lr, .bar-fill-rf').forEach(el => {
+            el.style.width = el.style.getPropertyValue('--w') ||
+                             getComputedStyle(el).getPropertyValue('--w');
+        });
+    }, 300);
+
+    // Set date
+    document.getElementById('dashDate').textContent =
+        new Date().toLocaleDateString('en-IN',
+        { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+});
+
+// Risk Simulator
+function updateSim() {
+    const sleep = parseInt(document.getElementById('simSleep').value);
+    const study = parseInt(document.getElementById('simStudy').value);
+    const mood  = parseInt(document.getElementById('simMood').value);
+    const brk   = parseInt(document.getElementById('simBreak').value);
+
+    document.getElementById('sleepVal').textContent = sleep;
+    document.getElementById('studyVal').textContent = study;
+    document.getElementById('moodVal').textContent  = mood;
+    document.getElementById('breakVal').textContent = brk;
+
+    // Simple risk score calculation
+    let score = 0;
+    score += (10 - sleep) * 10;
+    score += (study - 4)  * 6;
+    score += (10 - mood)  * 8;
+    score += (6  - brk)   * 5;
+    score  = Math.max(0, Math.min(100, score));
+
+    const meter  = document.getElementById('meterFill');
+    const badge  = document.getElementById('simBadge');
+    const tip    = document.getElementById('simTip');
+
+    meter.style.width = score + '%';
+
+    if (score < 35) {
+        meter.style.background = 'linear-gradient(90deg, #27ae60, #2ecc71)';
+        badge.textContent      = '✅ LOW RISK';
+        badge.className        = 'sim-badge badge-low';
+        tip.textContent        = 'Great habits! Keep maintaining this balance.';
+    } else if (score < 65) {
+        meter.style.background = 'linear-gradient(90deg, #d68910, #f39c12)';
+        badge.textContent      = '⚠️ MEDIUM RISK';
+        badge.className        = 'sim-badge badge-medium';
+        tip.textContent        = 'Watch out! Try sleeping more and reducing study hours.';
+    } else {
+        meter.style.background = 'linear-gradient(90deg, #c0392b, #e74c3c)';
+        badge.textContent      = '🚨 HIGH RISK';
+        badge.className        = 'sim-badge badge-high';
+        tip.textContent        = 'Danger zone! Take a break and prioritize sleep immediately.';
+    }
+}
+updateSim();
+</script>
+
+{% endblock %}
