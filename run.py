@@ -1,43 +1,52 @@
-from flask import Flask, render_template, request, jsonify
-import joblib
-import json
-import numpy as np
 import os
+import json
+import joblib
+import numpy as np
+import pandas as pd
+from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__,
             template_folder='templates',
             static_folder='static')
 
-app.config['SECRET_KEY'] = 'burnout-detection-2024'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'burnout-detection-2024')
 
-# ── Load Models ──────────────────────────────
-BASE = os.path.dirname(__file__)
+# ── Auto Generate Models If Missing ─────────────────────────
+if not os.path.exists('models/best_model.pkl'):
+    print("⚠️  Models not found — generating now...")
+    os.system('python generate_data.py')
+    os.system('python preprocess.py')
+    os.system('python train_model.py')
+    print("✅ Models ready!")
 
+# ── Prediction Function ──────────────────────────────────────
 def predict_burnout(data):
-    model    = joblib.load(os.path.join(BASE, 'models', 'best_model.pkl'))
-    scaler   = joblib.load(os.path.join(BASE, 'models', 'scaler.pkl'))
-    
-    with open(os.path.join(BASE, 'models', 'features.json')) as f:
+    model    = joblib.load('models/best_model.pkl')
+    scaler   = joblib.load('models/scaler.pkl')
+
+    with open('models/features.json') as f:
         features = json.load(f)
 
-    values        = np.array([[data[f] for f in features]])
-    values_scaled = scaler.transform(values)
+    df            = pd.DataFrame([data], columns=features)
+    values_scaled = scaler.transform(df)
     prediction    = model.predict(values_scaled)[0]
     probs         = model.predict_proba(values_scaled)[0]
 
     label_map  = {0: 'Low', 1: 'Medium', 2: 'High'}
+    risk_level = label_map[prediction]
+    confidence = round(float(max(probs)) * 100, 2)
 
     return {
-        'risk_level': label_map[prediction],
-        'confidence': round(max(probs) * 100, 2),
+        'risk_level': risk_level,
+        'confidence': confidence,
         'probabilities': {
-            'Low':    round(probs[0] * 100, 2),
-            'Medium': round(probs[1] * 100, 2),
-            'High':   round(probs[2] * 100, 2)
+            'Low':    round(float(probs[0]) * 100, 2),
+            'Medium': round(float(probs[1]) * 100, 2),
+            'High':   round(float(probs[2]) * 100, 2)
         }
     }
 
-# ── Routes ───────────────────────────────────
+# ── Routes ───────────────────────────────────────────────────
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -66,22 +75,31 @@ def predict():
 @app.route('/dashboard')
 def dashboard():
     return render_template('dashboard.html')
-@app.route('/api/predict', methods=['POST'])
-def api_predict():
-     try:
-        data   = request.get_json()
-        result = predict_burnout(data)
-        return jsonify({'success': True, 'result': result})
-     except Exception as e:
-         return jsonify({'success': False, 'error': str(e)})
+
 @app.route('/timer')
 def timer():
     return render_template('timer.html')
 
-# ── Start Server ──────────────────────────
+@app.route('/api/predict', methods=['POST'])
+def api_predict():
+    try:
+        data   = request.get_json()
+        result = predict_burnout(data)
+        return jsonify({'success': True, 'result': result})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.errorhandler(404)
+def not_found(e):
+    return render_template('index.html'), 404
+
+@app.errorhandler(500)
+def server_error(e):
+    return jsonify({'error': 'Internal server error'}), 500
+
+# ── Start Server ─────────────────────────────────────────────
 if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
     print("Starting Burnout Detection System...")
-    print("Open browser: http://127.0.0.1:5000")
-    import os
-port = int(os.environ.get('PORT', 5000))
-app.run(host='0.0.0.0', port=port, debug=False)
+    print(f"Open browser: http://127.0.0.1:{port}")
+    app.run(host='0.0.0.0', port=port, debug=False)
